@@ -1,4 +1,6 @@
-﻿using JWT.Algorithms;
+﻿using JWT;
+using JWT.Algorithms;
+using JWT.Serializers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyTestDemo.Models.MyJwt;
@@ -21,7 +23,7 @@ namespace MyTestDemo.Controller
         public TokenInfo Login(LoginRequest loginRequest)
         {
 
-            TokenInfo token = new TokenInfo();//需要返回的口令信息
+            TokenInfo tokenInfo = new TokenInfo();//需要返回的口令信息
 
             if (loginRequest != null)
             {
@@ -50,19 +52,37 @@ namespace MyTestDemo.Controller
                     byte[] key = Encoding.UTF8.GetBytes(secretKey);
 
                     IJwtAlgorithm algorithm = new RS512Algorithm(RSA.Create());///加密方式
+                    IJsonSerializer serializer = new JsonNetSerializer();//序列化Json
+                    IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();//base64加解密
+                    IJwtEncoder encoder = new JwtEncoder(algorithm, serializer, urlEncoder);
 
+                    var token = encoder.Encode(authInfo, key);
+
+
+                    tokenInfo.Success = true;
+                    tokenInfo.Token = token;
+                    tokenInfo.Message = "OK";
                 }
                 catch (Exception ex)
                 {
-
+                    tokenInfo.Success = false;
+                    tokenInfo.Message = "获取Token出错:" + ex.Message;
                 }
 
+
+            }
+            else
+            {
+                tokenInfo.Success = false;
+                tokenInfo.Message = "用户信息为空";
             }
 
 
-
-            return token;
+            return tokenInfo;
 
         }
+
+
+
     }
 }
