@@ -1,3 +1,4 @@
+using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -45,6 +46,15 @@ namespace MyTestDemo
 
         }
 
+        /// <summary>
+        /// with Autofac. This runs after ConfigureServices so the things
+        /// </summary>
+        /// <param name="builder"></param>
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            //builder.RegisterModule();
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -70,5 +80,8 @@ namespace MyTestDemo
                 endpoints.MapControllers();
             });
         }
+
+
+
     }
 }
